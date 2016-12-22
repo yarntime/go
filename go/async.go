@@ -22,9 +22,13 @@ func main() {
 		ch <- i
 	}
 
-	time.Sleep(time.Second)
-	fmt.Printf("finish count is %d\n", finishCount)
-	close(ch)
+	for {
+		fmt.Printf("finish count is %d\n", finishCount)
+		if finishCount == 100000 {
+			break
+		}
+		time.Sleep(time.Second)
+	}
 }
 
 func worker(i int) {
