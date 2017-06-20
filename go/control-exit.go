@@ -2,37 +2,45 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"time"
 )
 
 func test() {
-	chex := make(chan int)
-	go exit(chex)
-	go forever()
+	chexit := make(chan int)
+	chforever := make(chan int)
+	go exit(chexit)
+	go forever(chforever)
 	select {
-	case <-chex:
+	case <-chexit:
 		fmt.Println("finished.")
-		return
+		chforever <- 1
 	}
 }
 
 func exit(ch chan int) {
 	for i := 0; i < 10; i++ {
 		fmt.Printf("exit %d\n", i)
-		time.Sleep(5000)
+		time.Sleep(1 * time.Second)
 	}
 	ch <- 1
 }
 
-func forever() {
-	for i := 0; i < math.MaxInt64; i++ {
-		fmt.Printf("forever %d\n", i)
-		time.Sleep(5000)
+func forever(ch chan int) {
+	var i = 0
+	for {
+		select {
+		case <-ch:
+			fmt.Println("forever exit.")
+			return
+		default:
+			fmt.Printf("forever %d\n", i)
+			i++
+			time.Sleep(1 * time.Second)
+		}
 	}
 }
 
 func main() {
-	go test()
-	select {}
+	test()
+	fmt.Println("main process exit.")
 }
