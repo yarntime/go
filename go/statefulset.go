@@ -20,24 +20,24 @@ import (
 	"github.com/golang/glog"
 )
 
-type RedisClusterControlInteface interface {
+type StatefulSetControlInteface interface {
 	GetRedisClusterStatefulSet(redisCluster *rapi.RedisCluster) ([]*apps.StatefulSet, error)
 	CreateStatefulSet(redisCluster *rapi.RedisCluster) (*apps.StatefulSet, error)
 	DeleteStatefulSet(redisCluster *rapi.RedisCluster, statefulSetName string) error
 }
 
-var _ RedisClusterControlInteface = &RedisClusterControl{}
+var _ StatefulSetControlInteface = &StatefulSetControl{}
 
 // RedisClusterControl contains requieres accessor to managing the RedisCluster statefulset
-type RedisClusterControl struct {
+type StatefulSetControl struct {
 	StatefulSetLister applisters.StatefulSetLister
 	KubeClient        clientset.Interface
 	Recorder          record.EventRecorder
 }
 
 // NewRedisClusterControl builds and returns new NewRedisClusterControl instance
-func NewRedisClusterControl(lister applisters.StatefulSetLister, client clientset.Interface, rec record.EventRecorder) *RedisClusterControl {
-	ctrl := &RedisClusterControl{
+func NewStatefulSetControl(lister applisters.StatefulSetLister, client clientset.Interface, rec record.EventRecorder) *StatefulSetControl {
+	ctrl := &StatefulSetControl{
 		StatefulSetLister: lister,
 		KubeClient:        client,
 		Recorder:          rec,
@@ -45,7 +45,7 @@ func NewRedisClusterControl(lister applisters.StatefulSetLister, client clientse
 	return ctrl
 }
 
-func (p *RedisClusterControl) GetRedisClusterStatefulSet(redisCluster *rapi.RedisCluster) ([]*apps.StatefulSet, error) {
+func (p *StatefulSetControl) GetRedisClusterStatefulSet(redisCluster *rapi.RedisCluster) ([]*apps.StatefulSet, error) {
 	selector, err := CreateRedisClusterLabelSelector(redisCluster)
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func (p *RedisClusterControl) GetRedisClusterStatefulSet(redisCluster *rapi.Redi
 	return p.StatefulSetLister.List(selector)
 }
 
-func (p *RedisClusterControl) CreateStatefulSet(redisCluster *rapi.RedisCluster) (*apps.StatefulSet, error) {
+func (p *StatefulSetControl) CreateStatefulSet(redisCluster *rapi.RedisCluster) (*apps.StatefulSet, error) {
 	set, err := initSet(redisCluster)
 	if err != nil {
 		return set, err
@@ -62,7 +62,7 @@ func (p *RedisClusterControl) CreateStatefulSet(redisCluster *rapi.RedisCluster)
 	return p.KubeClient.AppsV1beta2().StatefulSets(redisCluster.Namespace).Create(set)
 }
 
-func (p *RedisClusterControl) DeleteStatefulSet(redisCluster *rapi.RedisCluster, statefulSetName string) error {
+func (p *StatefulSetControl) DeleteStatefulSet(redisCluster *rapi.RedisCluster, statefulSetName string) error {
 	glog.V(6).Infof("DeleteStatefulSet: %s/%s", redisCluster.Namespace, statefulSetName)
 	now := int64(0)
 	return p.KubeClient.AppsV1beta2().StatefulSets(redisCluster.Namespace).Delete(statefulSetName, &metav1.DeleteOptions{GracePeriodSeconds: &now})
