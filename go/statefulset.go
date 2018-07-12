@@ -28,14 +28,14 @@ type StatefulSetControlInteface interface {
 
 var _ StatefulSetControlInteface = &StatefulSetControl{}
 
-// RedisClusterControl contains requieres accessor to managing the RedisCluster statefulset
+// StatefulSetControl contains requieres accessor to managing the RedisCluster statefulset
 type StatefulSetControl struct {
 	StatefulSetLister applisters.StatefulSetLister
 	KubeClient        clientset.Interface
 	Recorder          record.EventRecorder
 }
 
-// NewRedisClusterControl builds and returns new NewRedisClusterControl instance
+// StatefulSetControl builds and returns new StatefulSetControl instance
 func NewStatefulSetControl(lister applisters.StatefulSetLister, client clientset.Interface, rec record.EventRecorder) *StatefulSetControl {
 	ctrl := &StatefulSetControl{
 		StatefulSetLister: lister,
