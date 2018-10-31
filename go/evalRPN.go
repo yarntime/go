@@ -7,7 +7,6 @@ func evalRPN(tokens []string) int {
 			second := stack[len(stack)-2]
 			stack = stack[:len(stack)-2]
 			stack = append(stack, first*second)
-			break
 		case "/":
 			first := stack[len(stack)-1]
 			second := stack[len(stack)-2]
@@ -19,23 +18,19 @@ func evalRPN(tokens []string) int {
 			} else {
 				stack = append(stack, 0)
 			}
-			break
 		case "+":
 			first := stack[len(stack)-1]
 			second := stack[len(stack)-2]
 			stack = stack[:len(stack)-2]
 			stack = append(stack, first+second)
-			break
 		case "-":
 			first := stack[len(stack)-1]
 			second := stack[len(stack)-2]
 			stack = stack[:len(stack)-2]
 			stack = append(stack, second-first)
-			break
 		default:
 			val, _ := strconv.Atoi(tokens[i])
 			stack = append(stack, val)
-			break
 		}
 	}
 	return stack[0]
