@@ -30,6 +30,7 @@ func Do(v interface{}) {
 	t, ok := v.(Role)
 	if !ok {
 		fmt.Printf("type mismatched.\n")
+		return
 	}
 	t.Do()
 }
